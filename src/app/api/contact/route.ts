@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 // 1. THIS IS REQUIRED FOR CLOUDFLARE BUILDS
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 interface ContactFormData {
   name: string;
