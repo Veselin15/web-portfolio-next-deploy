@@ -1,10 +1,40 @@
 'use client';
 
-import { Github, Linkedin, Mail, ExternalLink } from 'lucide-react';
+import React from 'react';
+import { Github, Linkedin, Mail, ExternalLink, LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// --- Components & Types ---
+
+// Custom Fiverr Icon Component
+const FiverrIcon = ({ className = "" }: { className?: string }) => (
+  <svg
+    viewBox="0 0 508.02 508.02"
+    fill="currentColor"
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="315.97" cy="162.19" r="26.87"/>
+    <path
+      d="M345.87,207.66h-123V199.6c0-15.83,15.83-16.13,23.89-16.13,9.25,0,13.44.9,13.44.9v-43.6a155.21,155.21,0,0,0-19.71-1.19c-25.68,0-73.16,7.16-73.16,61.51V208h-22.4v40.31h22.4v85.1h-20.9v40.31H247.34V333.37H222.85v-85.1H290v85.1H269.13v40.31h97.65V333.37H345.87Z"
+      transform="translate(-1.83 -0.98)"
+    />
+  </svg>
+);
+
+type ContactOption = {
+  name: string;
+  icon: LucideIcon | React.FC<{ className?: string }>;
+  colorClass: string; // Tailwind class for text color on hover/default
+  href?: string;
+  action?: () => void;
+  isExternal?: boolean;
+};
+
+// --- Main Component ---
+
 export default function Contact() {
-  // 1. Bot-Proofing: The email is broken into parts so simple scrapers can't read it
+  // 1. Bot-Proofing: The email is broken into parts
   const handleEmailClick = () => {
     const user = 'veselinveselinov06';
     const domain = 'gmail.com';
@@ -13,78 +43,123 @@ export default function Contact() {
     window.open(gmailUrl, '_blank');
   };
 
-  return (
-    <section id="contact" className="py-20 bg-gray-50 dark:bg-gray-800/50">
-      <div className="max-w-4xl mx-auto px-6 text-center">
+  const socialLinks: ContactOption[] = [
+    {
+      name: 'LinkedIn',
+      icon: Linkedin,
+      colorClass: 'text-[#0077b5]', // Official LinkedIn Blue
+      href: 'https://www.linkedin.com/in/veselin-veselinov-06b2082a6/',
+      isExternal: true,
+    },
+    {
+      name: 'GitHub',
+      icon: Github,
+      colorClass: 'text-gray-900 dark:text-white',
+      href: 'https://github.com/veselin15',
+      isExternal: true,
+    },
+    {
+      name: 'Fiverr',
+      icon: FiverrIcon,
+      colorClass: 'text-[#1DBF73]', // Official Fiverr Green
+      href: 'https://www.fiverr.com/veselin_v06',
+      isExternal: true,
+    },
+    {
+      name: 'Email',
+      icon: Mail,
+      colorClass: 'text-red-500',
+      action: handleEmailClick,
+      isExternal: false,
+    },
+  ];
 
-        <motion.h2
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
+
+  return (
+    <section id="contact" className="py-24 bg-gray-50 dark:bg-gray-800/50">
+      <div className="max-w-4xl mx-auto px-6">
+
+        {/* Header Section */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white"
+          viewport={{ once: true }}
+          className="text-center mb-16"
         >
-          Let's Connect
-        </motion.h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+            Let's Connect
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+            I'm currently available for freelance work and open to new opportunities.
+            Feel free to reach out via your preferred platform.
+          </p>
+        </motion.div>
 
-        <p className="text-gray-600 dark:text-gray-300 mb-12 text-lg">
-          I'm currently available for freelance work and open to new opportunities.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-
-          {/* LinkedIn */}
-          <a
-            href="https://www.linkedin.com/in/veselin-veselinov-06b2082a6/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] border border-gray-100 dark:border-gray-600 group"
-          >
-            <Linkedin className="w-6 h-6 text-[#0077b5]" />
-            <span className="font-medium text-gray-800 dark:text-gray-200">LinkedIn</span>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 ml-auto" />
-          </a>
-
-          {/* GitHub */}
-          <a
-            href="https://github.com/veselin15"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] border border-gray-100 dark:border-gray-600 group"
-          >
-            <Github className="w-6 h-6 text-gray-900 dark:text-white" />
-            <span className="font-medium text-gray-800 dark:text-gray-200">GitHub</span>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 ml-auto" />
-          </a>
-
-          {/* Fiverr */}
-          <a
-            href="https://www.fiverr.com/veselin_v06"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] border border-gray-100 dark:border-gray-600 group"
-          >
-            {/* Simple SVG for Fiverr since Lucide doesn't have it */}
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#1DBF73]">
-              <path d="M22.0003 16.5963C21.9829 17.5878 21.6148 18.5358 20.9492 19.2974C20.2835 20.059 19.3557 20.5937 18.303 20.8228C17.2503 21.052 16.1281 20.9636 15.1017 20.5707C14.0754 20.1778 13.1989 19.5008 12.6003 18.6392L12.0003 17.7766L11.4003 18.6392C10.8016 19.5008 9.9252 20.1778 8.89883 20.5707C7.87246 20.9636 6.75026 21.052 5.69757 20.8228C4.64488 20.5937 3.71701 20.059 3.05139 19.2974C2.38577 18.5358 2.01768 17.5878 2.0003 16.5963V7.0003H5.0003V16.5003C5.0003 17.3287 5.67187 18.0003 6.5003 18.0003C7.32872 18.0003 8.0003 17.3287 8.0003 16.5003V7.0003H11.0003V16.5003C11.0003 17.3287 11.6719 18.0003 12.5003 18.0003C13.3287 18.0003 14.0003 17.3287 14.0003 16.5003V7.0003H17.0003V16.5963H22.0003Z" />
-              <circle cx="19.5" cy="4.5" r="2.5" />
-            </svg>
-            <span className="font-medium text-gray-800 dark:text-gray-200">Fiverr</span>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 ml-auto" />
-          </a>
-
-          {/* Email (Bot Proof) */}
-          <button
-            onClick={handleEmailClick}
-            className="flex items-center justify-center gap-3 p-4 bg-white dark:bg-gray-700 rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02] border border-gray-100 dark:border-gray-600 group w-full"
-          >
-            <Mail className="w-6 h-6 text-red-500" />
-            <span className="font-medium text-gray-800 dark:text-gray-200 select-none">
-              Send me an Email
-            </span>
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 ml-auto" />
-          </button>
-
-        </div>
+        {/* Links Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto"
+        >
+          {socialLinks.map((link) => (
+            <ContactCard key={link.name} {...link} />
+          ))}
+        </motion.div>
       </div>
     </section>
+  );
+}
+
+// --- Sub-Component for Individual Cards ---
+
+function ContactCard({ name, icon: Icon, colorClass, href, action, isExternal }: ContactOption) {
+  const content = (
+    <>
+      <div className={`p-3 rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-colors`}>
+        <Icon className={`w-6 h-6 ${colorClass}`} />
+      </div>
+      <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+        {name === 'Email' ? 'Send me an Email' : name}
+      </span>
+      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300 ml-auto transition-colors" />
+    </>
+  );
+
+  const baseClasses = "flex items-center gap-4 p-4 bg-white dark:bg-gray-900/50 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 group transition-all hover:scale-[1.02] active:scale-[0.98]";
+
+  return (
+    <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}>
+      {action ? (
+        <button onClick={action} className={`${baseClasses} w-full`}>
+          {content}
+        </button>
+      ) : (
+        <a
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          className={baseClasses}
+        >
+          {content}
+        </a>
+      )}
+    </motion.div>
   );
 }
