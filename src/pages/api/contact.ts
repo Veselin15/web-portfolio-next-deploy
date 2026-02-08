@@ -1,9 +1,10 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-// 1. Pages Router Edge Runtime (Standard & Stable)
+// 1. Keep this to satisfy the Cloudflare Build Check
 export const runtime = 'edge';
-
+// 2. Add this to fix the "No such module" runtime crash
+export const dynamic = 'force-dynamic';
 interface ContactFormData {
   name: string;
   email: string;
