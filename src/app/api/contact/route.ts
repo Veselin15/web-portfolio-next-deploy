@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-// ❌ DELETE THIS LINE: export const runtime = 'edge';
+// 1. THIS IS REQUIRED FOR CLOUDFLARE BUILDS
+export const runtime = 'edge';
 
-// 1. Define the shape of the data
 interface ContactFormData {
   name: string;
   email: string;
