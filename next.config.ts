@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	/* config options here */
+  // 1. Disable image optimization for Cloudflare Free Tier
+  images: {
+    unoptimized: true,
+  },
+  // 2. Ensure standalone output is NOT used (Cloudflare uses its own adapter)
+  // output: "standalone",
 };
 
 export default nextConfig;
-
-// added by create cloudflare to enable calling `getCloudflareContext()` in `next dev`
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-initOpenNextCloudflareForDev();
