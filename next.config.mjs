@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   // 1. Required for Cloudflare Pages (Free Tier)
   images: {
     unoptimized: true,
