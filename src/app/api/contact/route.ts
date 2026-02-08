@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// 1. Force Edge Runtime for Cloudflare
-export const runtime = 'edge';
+// ❌ DELETE THIS LINE: export const runtime = 'edge';
 
-// 2. Define the shape of the data we expect
 interface ContactFormData {
   name: string;
   email: string;
@@ -12,20 +10,16 @@ interface ContactFormData {
 }
 
 export async function POST(request: Request) {
-  // Safety check for API Key
   if (!process.env.RESEND_API_KEY) {
-    console.error("Missing RESEND_API_KEY");
     return NextResponse.json({ error: "Server Error: Missing Config" }, { status: 500 });
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
-    // 3. FIX: Cast the JSON to our interface using 'as'
     const body = await request.json() as ContactFormData;
     const { name, email, message } = body;
 
-    // Validate fields exist
     if (!name || !email || !message) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
