@@ -1,10 +1,8 @@
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-// 1. Keep this to satisfy the Cloudflare Build Check
+// 1. Pages Router only needs this (Remove 'dynamic' export)
 export const runtime = 'edge';
-// 2. Add this to fix the "No such module" runtime crash
-export const dynamic = 'force-dynamic';
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -12,7 +10,6 @@ interface ContactFormData {
 }
 
 export default async function handler(req: NextRequest) {
-  // 2. Handle only POST requests
   if (req.method !== 'POST') {
     return new NextResponse(JSON.stringify({ error: "Method not allowed" }), { status: 405 });
   }
