@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
+// ❌ DELETE THIS LINE: export const runtime = 'edge';
 
 // 1. Define the shape of the data
 interface ContactFormData {
@@ -20,7 +20,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    // 2. Fix TS Error: Tell TypeScript what the JSON looks like
     const body = await request.json() as ContactFormData;
     const { name, email, message } = body;
 
@@ -55,12 +54,9 @@ export async function POST(request: Request) {
     const data = await res.json();
     return NextResponse.json({ success: true, data });
 
-  } catch (error: unknown) { // 3. Fix ESLint Error: Use 'unknown' instead of 'any'
+  } catch (error: unknown) {
     console.error("Server Exception:", error);
-
-    // Safely extract the error message
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-
     return NextResponse.json({
       error: "Internal Server Exception",
       details: errorMessage
