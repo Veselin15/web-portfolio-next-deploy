@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "deploy": "echo 'Deployment is handled automatically by Cloudflare Pages'",
     "start": "next start",
     "lint": "eslint"
   },
@@ -28,12 +30,5 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
-  },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "start": "next start",
-    "lint": "eslint"
   }
 }
