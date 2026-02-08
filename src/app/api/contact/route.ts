@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-// 1. Mandatory for Cloudflare Pages
 export const runtime = 'edge';
 
+// 1. Define the shape of the data
 interface ContactFormData {
   name: string;
   email: string;
@@ -13,19 +13,21 @@ export async function POST(request: Request) {
   const apiKey = process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    return NextResponse.json({ error: "Server Error: Missing Config" }, { status: 500 });
+    return NextResponse.json({
+      error: "Configuration Error",
+      details: "RESEND_API_KEY is missing from Cloudflare environment variables."
+    }, { status: 500 });
   }
 
   try {
+    // 2. Fix TS Error: Tell TypeScript what the JSON looks like
     const body = await request.json() as ContactFormData;
     const { name, email, message } = body;
 
     if (!name || !email || !message) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ error: "Validation Error", details: "Missing name, email, or message." }, { status: 400 });
     }
 
-    // 2. Use standard fetch instead of the Resend SDK
-    // This bypasses the "Stream" error completely.
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from: 'Portfolio Contact <onboarding@resend.dev>',
         to: ['veselinveselinov06@gmail.com'],
-        reply_to: email, // Note: Resend API uses snake_case 'reply_to'
+        reply_to: email,
         subject: `New Message from ${name} (Portfolio)`,
         text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
       }),
@@ -44,14 +46,24 @@ export async function POST(request: Request) {
     if (!res.ok) {
       const errorData = await res.json();
       console.error("Resend API Error:", errorData);
-      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+      return NextResponse.json({
+        error: "Resend API Error",
+        details: errorData
+      }, { status: 500 });
     }
 
     const data = await res.json();
     return NextResponse.json({ success: true, data });
 
-  } catch (error) {
-    console.error("Error processing request:", error);
-    return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
+  } catch (error: unknown) { // 3. Fix ESLint Error: Use 'unknown' instead of 'any'
+    console.error("Server Exception:", error);
+
+    // Safely extract the error message
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+
+    return NextResponse.json({
+      error: "Internal Server Exception",
+      details: errorMessage
+    }, { status: 500 });
   }
 }
