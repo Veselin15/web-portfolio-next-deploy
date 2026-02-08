@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
-// ❌ DELETE THIS LINE: export const runtime = 'edge';
+// 1. Mandatory for Cloudflare Pages
+export const runtime = 'edge';
 
 interface ContactFormData {
   name: string;
@@ -10,11 +10,11 @@ interface ContactFormData {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
     return NextResponse.json({ error: "Server Error: Missing Config" }, { status: 500 });
   }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     const body = await request.json() as ContactFormData;
@@ -24,19 +24,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const data = await resend.emails.send({
-      from: 'Portfolio Contact <onboarding@resend.dev>',
-      to: ['veselinveselinov06@gmail.com'],
-      replyTo: email,
-      subject: `New Message from ${name} (Portfolio)`,
-      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+    // 2. Use standard fetch instead of the Resend SDK
+    // This bypasses the "Stream" error completely.
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        from: 'Portfolio Contact <onboarding@resend.dev>',
+        to: ['veselinveselinov06@gmail.com'],
+        reply_to: email, // Note: Resend API uses snake_case 'reply_to'
+        subject: `New Message from ${name} (Portfolio)`,
+        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+      }),
     });
 
-    if (data.error) {
-      return NextResponse.json({ error: data.error }, { status: 500 });
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("Resend API Error:", errorData);
+      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
     }
 
+    const data = await res.json();
     return NextResponse.json({ success: true, data });
+
   } catch (error) {
     console.error("Error processing request:", error);
     return NextResponse.json({ error: "Failed to process request" }, { status: 500 });
