@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
-import { Github, Linkedin, Mail, ExternalLink, LucideIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Github, Linkedin, Mail, ExternalLink, Copy, Check, LucideIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Components & Types ---
+// --- Custom Components ---
 
-// Custom Fiverr Icon Component
+// Fiverr Icon (Same as before)
 const FiverrIcon = ({ className = "" }: { className?: string }) => (
   <svg
     viewBox="0 0 508.02 508.02"
@@ -23,141 +23,232 @@ const FiverrIcon = ({ className = "" }: { className?: string }) => (
 );
 
 type ContactOption = {
+  id: string;
   name: string;
   icon: LucideIcon | React.FC<{ className?: string }>;
-  colorClass: string; // Tailwind class for text color on hover/default
+  color: string; // Hex color for hover glow
   href?: string;
   action?: () => void;
   isExternal?: boolean;
+  description: string;
 };
 
 // --- Main Component ---
 
 export default function Contact() {
-  // 1. Bot-Proofing: The email is broken into parts
+  const [copied, setCopied] = useState(false);
+
+  // 1. Bot-Proofing & Logic
+  const emailUser = 'veselinveselinov06';
+  const emailDomain = 'gmail.com';
+  const fullEmail = `${emailUser}@${emailDomain}`;
+
   const handleEmailClick = () => {
-    const user = 'veselinveselinov06';
-    const domain = 'gmail.com';
-    // 2. This opens the Gmail Compose window directly
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${user}@${domain}`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${fullEmail}`;
     window.open(gmailUrl, '_blank');
+  };
+
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the main click
+    navigator.clipboard.writeText(fullEmail);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const socialLinks: ContactOption[] = [
     {
+      id: 'linkedin',
       name: 'LinkedIn',
       icon: Linkedin,
-      colorClass: 'text-[#0077b5]', // Official LinkedIn Blue
+      color: '#0077b5',
+      description: 'Connect professionally',
       href: 'https://www.linkedin.com/in/veselin-veselinov-06b2082a6/',
       isExternal: true,
     },
     {
+      id: 'github',
       name: 'GitHub',
       icon: Github,
-      colorClass: 'text-gray-900 dark:text-white',
+      color: '#333', // Dark for light mode, White for dark mode handled in CSS
+      description: 'Check my repositories',
       href: 'https://github.com/veselin15',
       isExternal: true,
     },
     {
+      id: 'fiverr',
       name: 'Fiverr',
       icon: FiverrIcon,
-      colorClass: 'text-[#1DBF73]', // Official Fiverr Green
+      color: '#1DBF73',
+      description: 'Hire me for freelance',
       href: 'https://www.fiverr.com/veselin_v06',
       isExternal: true,
     },
     {
+      id: 'email',
       name: 'Email',
       icon: Mail,
-      colorClass: 'text-red-500',
+      color: '#EA4335',
+      description: 'Send me a message',
       action: handleEmailClick,
       isExternal: false,
     },
   ];
 
-  // Animation Variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
-  };
-
   return (
-    <section id="contact" className="py-24 bg-gray-50 dark:bg-gray-800/50">
-      <div className="max-w-4xl mx-auto px-6">
+    <section id="contact" className="relative py-24 overflow-hidden bg-gray-50 dark:bg-[#0B1120]">
+      {/* Dynamic Background Blobs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-blob" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-blob animation-delay-2000" />
+      </div>
 
-        {/* Header Section */}
+      <div className="relative max-w-5xl mx-auto px-6">
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 dark:text-white">
-            Let's Connect
+          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 mb-6">
+            Let's Work Together
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-            I'm currently available for freelance work and open to new opportunities.
-            Feel free to reach out via your preferred platform.
+          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            I'm currently available for freelance projects and open to new opportunities.
+            Have a project in mind? Let's discuss it.
           </p>
         </motion.div>
 
-        {/* Links Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto"
-        >
-          {socialLinks.map((link) => (
-            <ContactCard key={link.name} {...link} />
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+          {socialLinks.map((link, index) => (
+            <ContactCard
+              key={link.id}
+              {...link}
+              index={index}
+              onCopy={link.id === 'email' ? handleCopyEmail : undefined}
+              copied={link.id === 'email' ? copied : undefined}
+            />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
 
-// --- Sub-Component for Individual Cards ---
+// --- Card Component ---
 
-function ContactCard({ name, icon: Icon, colorClass, href, action, isExternal }: ContactOption) {
-  const content = (
-    <>
-      <div className={`p-3 rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-gray-100 dark:group-hover:bg-gray-700 transition-colors`}>
-        <Icon className={`w-6 h-6 ${colorClass}`} />
+interface ContactCardProps extends ContactOption {
+  index: number;
+  onCopy?: (e: React.MouseEvent) => void;
+  copied?: boolean;
+}
+
+function ContactCard({ name, icon: Icon, color, href, action, isExternal, description, index, onCopy, copied }: ContactCardProps) {
+  const isEmail = name === 'Email';
+
+  // Base wrapper content
+  const CardContent = () => (
+    <div className="flex items-center gap-5 p-6 h-full">
+      {/* Icon Container with Glow */}
+      <div
+        className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 transition-transform group-hover:scale-110 duration-300"
+        style={{ color: isEmail ? color : undefined }}
+      >
+        {/* Hover Glow Effect behind icon */}
+        <div
+          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-md"
+          style={{ backgroundColor: color }}
+        />
+        <Icon className={`w-7 h-7 z-10 transition-colors duration-300 ${!isEmail ? 'text-gray-700 dark:text-white group-hover:text-[var(--hover-color)]' : ''}`}
+              style={{ '--hover-color': color } as React.CSSProperties}
+        />
       </div>
-      <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
-        {name === 'Email' ? 'Send me an Email' : name}
-      </span>
-      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300 ml-auto transition-colors" />
-    </>
+
+      {/* Text Content */}
+      <div className="flex-1 text-left">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-[var(--hover-color)] transition-colors duration-300"
+            style={{ '--hover-color': color } as React.CSSProperties}>
+          {name}
+        </h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {description}
+        </p>
+      </div>
+
+      {/* Action Icons */}
+      <div className="flex flex-col items-end gap-2 text-gray-400">
+        <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+
+        {/* Copy Button for Email */}
+        {isEmail && onCopy && (
+          <button
+            onClick={onCopy}
+            className="p-2 -mr-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-20 group/copy"
+            title="Copy email to clipboard"
+          >
+            <AnimatePresence mode='wait' initial={false}>
+              {copied ? (
+                <motion.div
+                  key="check"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                >
+                  <Check className="w-4 h-4 text-green-500" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="copy"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                >
+                  <Copy className="w-4 h-4 group-hover/copy:text-gray-900 dark:group-hover/copy:text-white" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </button>
+        )}
+      </div>
+    </div>
   );
 
-  const baseClasses = "flex items-center gap-4 p-4 bg-white dark:bg-gray-900/50 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-gray-700 group transition-all hover:scale-[1.02] active:scale-[0.98]";
+  // Common styles for the glassmorphic card
+  const containerStyles = `
+    group relative w-full overflow-hidden
+    bg-white/60 dark:bg-gray-900/40 
+    backdrop-blur-md 
+    border border-gray-200/50 dark:border-gray-700/50
+    rounded-3xl
+    hover:border-[var(--hover-color)] dark:hover:border-[var(--hover-color)]
+    hover:shadow-lg hover:shadow-[var(--shadow-color)]/10
+    transition-all duration-300
+  `;
 
+  // Render as Button or Anchor
   return (
-    <motion.div variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="h-full"
+      style={{ '--hover-color': color, '--shadow-color': color } as React.CSSProperties}
+    >
       {action ? (
-        <button onClick={action} className={`${baseClasses} w-full`}>
-          {content}
+        <button onClick={action} className={`${containerStyles} w-full text-left`}>
+          <CardContent />
         </button>
       ) : (
         <a
           href={href}
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
-          className={baseClasses}
+          className={`${containerStyles} block`}
         >
-          {content}
+          <CardContent />
         </a>
       )}
     </motion.div>
