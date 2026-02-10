@@ -80,7 +80,7 @@ export default function Contact() {
       icon: FiverrIcon,
       color: '#1DBF73',
       description: 'Hire me for freelance',
-      href: 'https://www.fiverr.com/veselin_v06',
+      href: 'https://www.fiverr.com/s/0bLY8lx',
       isExternal: true,
     },
     {
