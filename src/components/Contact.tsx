@@ -62,7 +62,7 @@ export default function Contact() {
       icon: Linkedin,
       color: '#0077b5',
       description: 'Connect professionally',
-      href: 'https://www.linkedin.com/in/veselin-veselinov-06b2082a6/',
+      href: 'https://www.linkedin.com/in/veselin-veselinov-a7bb9930a/',
       isExternal: true,
     },
     {
